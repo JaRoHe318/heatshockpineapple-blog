@@ -1,0 +1,188 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('posts');
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Group posts by Year
+const postsByYear = sortedPosts.reduce((acc, post) => {
+  const year = post.data.pubDate.getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {});
+
+const years = Object.keys(postsByYear).sort((a, b) => b - a);
+---
+
+<BaseLayout title="Archive" wide={true}>
+  
+  <header class="page-header">
+    <div class="header-content">
+      <h1>The Archive</h1>
+      <p class="subtitle">Chronological log of all protocols and observations.</p>
+    </div>
+  </header>
+
+  <div class="archive-container">
+    {years.map(year => (
+      <div class="year-group">
+        <h2 class="year-label">{year}</h2>
+        
+        <div class="year-grid">
+          {postsByYear[year].map((post) => (
+            <a href={`/posts/${post.slug}`} class="log-entry">
+              <div class="log-date">
+                {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </div>
+              
+              <div class="log-main">
+                <h3 class="log-title">{post.data.title}</h3>
+                <p class="log-desc">{post.data.description}</p>
+              </div>
+
+              <div class="log-meta">
+                {post.data.tags.slice(0, 1).map(tag => (
+                  /* TAG: GOLD */
+                  <span class="tag">#{tag}</span>
+                ))}
+                <span class="arrow">→</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+</BaseLayout>
+
+<style>
+  /* Page Header */
+  .page-header {
+    margin-top: 4rem; margin-bottom: 3rem;
+    padding: 0 1rem;
+  }
+  h1 { font-family: var(--font-serif); font-size: 3rem; color: var(--text-main); margin-bottom: 0.5rem; }
+  .subtitle { font-family: var(--font-mono); color: var(--text-muted); }
+
+  /* CONTAINER: The White Paper */
+  .archive-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    margin-bottom: 5rem;
+  }
+  @media (min-width: 900px) { .archive-container { padding: 4rem; } }
+
+  /* YEAR GROUPS */
+  .year-group { margin-bottom: 4rem; }
+  .year-group:last-child { margin-bottom: 0; }
+
+  .year-label {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    color: var(--border); 
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    /* Soften the year divider too */
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.5rem;
+    opacity: 0.5;
+  }
+
+  /* THE ENTRIES (Fixing the "Bar Graph" look) */
+  .log-entry {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    
+    /* CHANGE: Increased padding for airiness */
+    padding: 2rem 1.5rem; 
+    
+    /* CHANGE: Removed the bottom border (The Bar Graph Line) */
+    border-bottom: none; 
+    
+    /* Rounded corners for the hover state */
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    
+    /* Negative margin allows the hover effect to expand without shifting layout */
+    margin: 0 -1.5rem;
+  }
+  
+  /* HOVER: Soft background wash instead of lines */
+  .log-entry:hover { 
+    background-color: var(--bg-paper); 
+    transform: translateY(-2px);
+  }
+
+  /* Desktop Layout */
+  @media (min-width: 768px) {
+    .log-entry {
+      grid-template-columns: 100px 1fr 120px; 
+      align-items: baseline;
+      gap: 2rem;
+    }
+  }
+
+  /* TYPOGRAPHY */
+  .log-date {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-secondary); /* Gold */
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .log-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem; /* Slightly bigger for readability */
+    color: var(--accent-nature); /* Green */
+    margin: 0 0 0.5rem 0;
+    transition: color 0.2s ease;
+    line-height: 1.2;
+  }
+  
+  /* Heat Shock Effect */
+  .log-entry:hover .log-title { color: var(--accent-primary); }
+
+  .log-desc {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
+    max-width: 55ch;
+    line-height: 1.6;
+  }
+
+  .log-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .tag { color: var(--accent-secondary); opacity: 0.8; font-weight: 500; }
+  
+  .arrow { 
+    opacity: 0; 
+    transform: translateX(-10px);
+    transition: all 0.2s ease; 
+    color: var(--accent-primary); 
+    font-size: 1.2rem;
+  }
+  
+  .log-entry:hover .arrow { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+</style>

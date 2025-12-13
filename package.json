@@ -4,11 +4,17 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "start": "astro dev",
+    "build": "astro build && pagefind --site dist", 
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.16.4"
+    "@heatshockpineapple/design-tokens": "github:JaRoHe318/pineapple-design-tokens",
+    "astro": "^5.16.4",
+    "photoswipe": "^5.4.4"
+  },
+  "devDependencies": {
+    "pagefind": "^1.4.0"
   }
 }

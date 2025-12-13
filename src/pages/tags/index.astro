@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// 1. Get all posts
+const allPosts = await getCollection('posts');
+
+// 2. Extract tags and count them
+const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+const tagCounts = tags.reduce((acc, tag) => {
+  acc[tag] = allPosts.filter(p => p.data.tags.includes(tag)).length;
+  return acc;
+}, {});
+---
+
+<BaseLayout title="All Tags">
+  <header class="page-header">
+    <h1>Index</h1>
+    <p class="subtitle">Filter observations by topic.</p>
+  </header>
+
+  <div class="tags-container">
+    {tags.sort().map((tag) => (
+      <a href={`/tags/${tag}`} class="tag-link">
+        <span class="tag-name">#{tag}</span>
+        <span class="tag-count">{tagCounts[tag]}</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-header { margin-bottom: 4rem; }
+  h1 { font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .subtitle { font-family: var(--font-mono); color: var(--text-muted); font-size: 0.9rem; }
+
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .tag-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: var(--bg-surface);
+  }
+
+  .tag-link:hover {
+    border-color: var(--text-main);
+    transform: translateY(-2px);
+  }
+
+  .tag-name {
+    font-family: var(--font-mono);
+    color: var(--text-main);
+    font-size: 0.9rem;
+  }
+
+  .tag-count {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-body); /* Subtle contrast */
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>

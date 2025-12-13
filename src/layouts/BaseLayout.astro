@@ -1,0 +1,86 @@
+---
+import { ClientRouter } from 'astro:transitions'; 
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+// Add 'wide' prop
+const { title, description = "Notes on photography & physics.", wide = false } = Astro.props;
+
+const siteName = "Heat Shock Pineapple";
+const fullTitle = title ? `${title} · ${siteName}` : siteName;
+
+// SEO LOGIC: Generate specific URLs for social sharing
+// We default to the current page URL for the canonical link
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://blog.heatshockpineapple.com');
+
+// We look for a specific image for the page, or fallback to a default site-wide image
+// Ensure you place an image named 'og-image.jpg' in your /public/ folder!
+const socialImageURL = new URL('/og-image.jpg', Astro.url);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <ClientRouter />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={socialImageURL} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+    
+    <script is:inline>
+        const setTheme = () => {
+          const stored = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = stored || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        };
+        setTheme();
+        document.addEventListener("astro:after-swap", setTheme);
+    </script>
+  </head>
+  <body>
+    
+    <Header />
+      
+    <main class={wide ? "wide-wrapper" : "reading-wrapper"}>
+      <slot />
+    </main>
+      
+    <Footer />
+
+  </body>
+</html>
+
+<style>
+  /* Standard Blog Post Width */
+  .reading-wrapper {
+    width: 100%;
+    max-width: var(--reading-width, 740px); 
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    min-height: 80vh;
+  }
+
+  /* NEW: Expansive Portfolio Width */
+  .wide-wrapper {
+    width: 100%;
+    max-width: 1600px; /* Matches your Photos/Portfolio feel */
+    margin: 0 auto;
+    padding: 0 2rem;
+    min-height: 80vh;
+  }
+</style>

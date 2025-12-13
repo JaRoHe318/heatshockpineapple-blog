@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = "About & Colophon";
+const description = "The operator, the theory, and the machinery behind Heat Shock Pineapple.";
+
+// Tech Stack Data
+const stack = [
+  { label: "Framework", value: "Astro 5.0" },
+  { label: "Styling", value: "CSS Modules + Variables" },
+  { label: "Typeface (Serif)", value: "Newsreader" },
+  { label: "Typeface (Mono)", value: "JetBrains Mono" },
+  { label: "Hosting", value: "Vercel / Edge" },
+  { label: "License", value: "MIT" },
+];
+---
+
+<BaseLayout title={pageTitle} description={description} wide={true}>
+  
+  <div class="about-container">
+    
+    <header class="about-header">
+      <span class="section-label">Subject: Jason Hernandez</span>
+      <h1 class="about-title">The <span class="highlight">Operator</span></h1>
+    </header>
+
+    <div class="content-grid">
+      
+      <section class="bio-section">
+        <p class="lead-text">
+          I am a developer and photographer based in California. 
+          <em>Heat Shock Pineapple</em> is my personal laboratory for documenting what I learn 
+          about entropy, light, and the code that holds them together.
+        </p>
+        <p>
+          In biology, a <strong>Heat Shock Response</strong> is a cellular reflex—a surge of protective proteins 
+          triggered by stress, heat, or cold. It is how complex systems survive chaos.
+        </p>
+        <p>
+          This site operates on the same principle: I expose my ideas to the stress of 
+          public documentation. If they survive, they get written down. If they fail, 
+          they get rewritten.
+        </p>
+      </section>
+
+      <section class="colophon-section">
+        <div class="section-divider">
+          <span class="divider-label">System Specs</span>
+          <hr class="line" />
+        </div>
+
+        <div class="specs-grid">
+          {stack.map((item) => (
+            <div class="spec-item">
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </div>
+
+        <div class="colophon-note">
+          <p>
+            Designed in the browser. No tracking pixels. No cookies. 
+            Just raw HTML, CSS, and the occasional burst of JavaScript.
+          </p>
+          <p>
+            Questions? <a href="mailto:jrh@heatshockpineapple.com">Signal me.</a>
+          </p>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+</BaseLayout>
+
+<style>
+  /* --- CONTAINER: The "White Paper" --- */
+  .about-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-top: 4rem;
+    margin-bottom: 6rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    max-width: 900px; /* Reading width */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  @media (min-width: 768px) { .about-container { padding: 4rem; } }
+
+  /* --- HEADER --- */
+  .about-header { margin-bottom: 3rem; text-align: center; }
+  
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-secondary); /* Gold */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .about-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    color: var(--text-main);
+    line-height: 1;
+    margin: 0;
+  }
+  
+  .highlight { color: var(--accent-nature); font-style: italic; }
+
+  /* --- BIO TEXT --- */
+  .lead-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--text-main);
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .bio-section p {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  
+  .bio-section strong { color: var(--accent-primary); font-weight: 600; }
+  .bio-section em { font-family: var(--font-serif); color: var(--text-main); }
+
+  /* --- COLOPHON (The "Specs") --- */
+  .colophon-section { margin-top: 4rem; }
+
+  .section-divider {
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+  }
+  .divider-label {
+    font-family: var(--font-mono); font-size: 0.75rem; 
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+  .line { flex: 1; height: 1px; background: var(--border); border: none; }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  
+  @media (min-width: 600px) {
+    .specs-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  }
+
+  .spec-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .spec-item dt {
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);
+  }
+  
+  .spec-item dd {
+    font-family: var(--font-sans); font-size: 0.9rem; color: var(--text-main); font-weight: 600;
+  }
+
+  .colophon-note {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg-paper);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    line-height: 1.6;
+  }
+  
+  .colophon-note a {
+    color: var(--accent-nature); text-decoration: none; border-bottom: 1px solid transparent; transition: all 0.2s;
+  }
+  .colophon-note a:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+</style>

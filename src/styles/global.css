@@ -1,0 +1,130 @@
+@import "@heatshockpineapple/design-tokens/src/index.css";
+
+/* === "HEAT SHOCK JUNGLE" THEME === */
+:root {
+  /* --- LAYOUT --- */
+  --reading-width: 740px;
+
+  /* --- COLORS --- */
+  --bg-body: #fdfbf7;
+  --bg-paper: #fdfbf7;
+  --bg-surface: #ffffff;
+
+  /* 1. HEAT (Interaction): Oxblood Red */
+  --accent-primary: #751e29;
+
+  /* 2. LIGHT (Data): Antique Gold */
+  --accent-secondary: #a87e23;
+
+  /* 3. LIFE (Structure): DEEP JUNGLE GREEN */
+  --accent-nature: #243b30;
+
+  /* 4. GLOW */
+  --accent-glow: rgba(36, 59, 48, 0.12);
+  --accent-heat-glow: rgba(117, 30, 41, 0.08);
+
+  /* 5. TEXTURE (The Dot Grid) */
+  /* Reduced opacity to 0.06 so it doesn't fatigue the eye */
+  --grid-dot-color: rgba(0, 0, 0, 0.06);
+
+  /* Overlay / modal backdrop */
+  --overlay-bg: rgba(253, 251, 247, 0.95);
+
+  /* Selection */
+  --selection-bg: rgba(36, 59, 48, 0.15);
+}
+
+/* --- DARK MODE --- */
+[data-theme="dark"] {
+  --bg-body: #111111;
+  --bg-paper: #111111;
+  --bg-surface: #1a1a1a;
+
+  --accent-primary: #d66c84; /* Rose (Heat) */
+  --accent-secondary: #d4b059; /* Bright Gold */
+  --accent-nature: #8fbc8f; /* Dark Sea Green */
+
+  --accent-glow: rgba(143, 188, 143, 0.15);
+  --accent-heat-glow: rgba(214, 108, 132, 0.10);
+
+  /* White dots for dark mode (subtle starfield effect) */
+  --grid-dot-color: rgba(255, 255, 255, 0.05);
+
+  /* Overlay / modal backdrop */
+  --overlay-bg: rgba(17, 17, 17, 0.95);
+
+  /* Selection */
+  --selection-bg: rgba(143, 188, 143, 0.22);
+}
+
+/* --- GLOBAL STYLES --- */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-paper);
+  color: var(--text-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+
+  /* DOT GRID: Now uses the variable to handle Dark/Light switching */
+  background-image: radial-gradient(var(--grid-dot-color) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+}
+
+/* GLOW EFFECT: Now a mix of Green (Nature) and Red (Heat) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 10% 20%, var(--accent-glow) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, var(--accent-heat-glow) 0%, transparent 50%);
+}
+
+/* === OVERLAY / MODAL BACKDROP FIX === */
+/* If you use <dialog> for the search modal, this fixes the green tint: */
+dialog::backdrop {
+  background: var(--overlay-bg);
+  backdrop-filter: blur(10px);
+}
+
+/* If you use a div overlay instead of <dialog>,
+   rename these selectors to match your actual overlay element. */
+.search-overlay,
+.modal-overlay,
+#search-overlay,
+#search-modal {
+  background: var(--overlay-bg);
+  backdrop-filter: blur(10px);
+}
+
+main {
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+/* --- TYPOGRAPHY COLOR LOGIC --- */
+
+/* Tags are Gold */
+.tag {
+  color: var(--accent-secondary) !important;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Dates are Gold/Brown */
+time, .mono-meta, .log-date {
+  color: var(--accent-secondary) !important;
+  opacity: 0.9;
+}
+
+/* Selection is theme-aware */
+::selection {
+  background: var(--selection-bg);
+  color: inherit;
+}

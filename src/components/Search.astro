@@ -1,0 +1,192 @@
+<div class="search-wrap" data-search>
+  <input
+    type="text"
+    id="search-input"
+    placeholder="Type to search..."
+    autocomplete="off"
+    spellcheck="false"
+    aria-label="Search posts"
+  />
+
+  <div id="results-container" class="results-container">
+    <div class="empty-state">Start typing to search...</div>
+  </div>
+</div>
+
+<script type="module">
+  async function initSearch() {
+    const root = document.querySelector('[data-search]');
+    if (!root) return;
+
+    const input = root.querySelector('#search-input');
+    const container = root.querySelector('#results-container');
+    if (!input || !container) return;
+
+    // Prevent double-init
+    if (input.dataset.searchInit === '1') return;
+    input.dataset.searchInit = '1';
+
+    // REMOVED: input.focus() to prevent jumpiness on load.
+
+    let pagefind;
+    try {
+      pagefind = await import('/pagefind/pagefind.js');
+      await pagefind.init();
+    } catch (e) {
+      console.warn('[Search] Pagefind load failed:', e);
+      container.innerHTML = `<div class="empty-state">Search index missing. Run build.</div>`;
+      return;
+    }
+
+    let debounceTimer;
+    let lastRequestId = 0;
+
+    async function runSearch(raw) {
+      const query = (raw || '').trim();
+      const requestId = ++lastRequestId;
+
+      if (!query) {
+        container.innerHTML = `<div class="empty-state">Start typing to search...</div>`;
+        return;
+      }
+
+      container.innerHTML = `<div class="empty-state">Searching...</div>`;
+
+      try {
+        const search = await pagefind.search(query);
+        if (requestId !== lastRequestId) return;
+
+        const results = await Promise.all(
+          (search?.results || []).slice(0, 5).map((r) => r.data())
+        );
+        if (requestId !== lastRequestId) return;
+
+        if (!results.length) {
+          container.innerHTML = `<div class="empty-state">No results found.</div>`;
+          return;
+        }
+
+        container.innerHTML = results.map((item) => {
+          const title = item?.meta?.title ?? 'Untitled';
+          const url = item?.url ?? '#';
+          const excerpt = item?.excerpt ?? '';
+          return `
+            <a href="${url}" class="result-item">
+              <div class="result-title">${title}</div>
+              <div class="result-excerpt">${excerpt}</div>
+            </a>
+          `;
+        }).join('');
+      } catch (err) {
+        if (requestId !== lastRequestId) return;
+        console.warn('[Search] Query failed:', err);
+        container.innerHTML = `<div class="empty-state">Error searching.</div>`;
+      }
+    }
+
+    input.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => runSearch(e.target.value), 120);
+    });
+  }
+
+  initSearch();
+  document.addEventListener('astro:page-load', initSearch);
+  document.addEventListener('astro:after-swap', initSearch);
+</script>
+
+<style>
+  .search-wrap {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  #search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border, #ccc);
+    border-radius: 0;
+
+    font-family: var(--font-serif);
+    font-size: 2rem; 
+    color: var(--text-main);
+
+    padding: 1.5rem 0;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  #search-input:focus {
+    border-bottom-color: var(--accent-primary);
+  }
+
+  #search-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.5;
+    font-family: var(--font-sans);
+    font-size: 1.2rem;
+    font-style: italic;
+  }
+
+  .results-container {
+    margin-top: 2rem;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  :global(.result-item) {
+    display: block;
+    padding: 1.5rem 0;
+    border-bottom: 1px dashed var(--border);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  :global(.result-item:hover) { 
+    transform: translateX(10px);
+    padding-left: 1rem;
+    border-radius: 4px;
+    
+    /* POLISH: Smart tint based on theme text color */
+    background: color-mix(in srgb, var(--text-main) 5%, transparent);
+  }
+
+  :global(.result-title) {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+
+  :global(.result-item:hover .result-title) {
+    color: var(--accent-primary);
+  }
+
+  :global(.result-excerpt) {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  :global(.result-excerpt mark) {
+    background: transparent;
+    color: var(--accent-secondary);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  :global(.empty-state) {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 1rem;
+  }
+</style>

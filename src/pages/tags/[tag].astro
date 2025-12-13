@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// 1. Tell Astro what tags exist so it can build pages for them
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  
+  // Get unique list of tags
+  const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+
+  // Return a route for each tag, passing the filtered posts as props
+  return uniqueTags.map((tag) => {
+    const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+    return {
+      params: { tag },
+      props: { posts: filteredPosts },
+    };
+  });
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+
+// Sort by date (newest first)
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title={`#${tag}`}>
+  <header class="page-header">
+    <div class="breadcrumb">
+      <a href="/tags">← All Tags</a>
+    </div>
+    <h1>#{tag}</h1>
+    <p class="subtitle">{posts.length} observation{posts.length !== 1 ? 's' : ''} found.</p>
+  </header>
+
+  <section class="logbook">
+    <ul class="post-list">
+      {sortedPosts.map((post) => (
+        <li class="post-item">
+          <a href={`/posts/${post.slug}`} class="post-link">
+            <div class="post-meta">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </time>
+            </div>
+            <h2 class="post-title">{post.data.title}</h2>
+            <p class="post-desc">{post.data.description}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { margin-bottom: 4rem; }
+  .breadcrumb a { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1rem; display: block; }
+  .breadcrumb a:hover { color: var(--text-main); }
+  
+  h1 { font-family: var(--font-mono); font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--accent-primary); }
+  .subtitle { font-family: var(--font-sans); color: var(--text-muted); font-size: 0.9rem; }
+
+  /* REUSING POST LIST STYLES (Consistency with Index) */
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-item { margin-bottom: 3rem; border-left: 1px solid var(--border); padding-left: 1.5rem; transition: border-color 0.2s ease; }
+  .post-item:hover { border-left-color: var(--accent-primary); }
+  .post-link { text-decoration: none; display: block; }
+  
+  .post-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  
+  .post-title { font-family: var(--font-serif); font-size: 1.5rem; line-height: 1.2; margin: 0 0 0.5rem 0; color: var(--text-main); transition: color 0.2s; }
+  .post-link:hover .post-title { text-decoration: underline; text-underline-offset: 4px; }
+  
+  .post-desc { font-family: var(--font-sans); font-size: 1rem; line-height: 1.6; color: var(--text-muted); margin: 0; max-width: 60ch; }
+</style>

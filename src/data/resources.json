@@ -1,0 +1,45 @@
+[
+  {
+    "category": "Web Development",
+    "description": "Tools and frameworks used to build the Heat Shock Network.",
+    "links": [
+      {
+        "title": "Astro Documentation",
+        "url": "https://docs.astro.build",
+        "desc": "The web framework used for this blog."
+      },
+      {
+        "title": "GitHub: Design Tokens",
+        "url": "https://github.com/JaRoHe318/pineapple-design-tokens",
+        "desc": "My centralized design system repository."
+      }
+    ]
+  },
+  {
+    "category": "Science & Biophysics",
+    "description": "References for calculations, kinetics, and biology.",
+    "links": [
+      {
+        "title": "Michaelis-Menten Kinetics",
+        "url": "https://en.wikipedia.org/wiki/Michaelis%E2%80%93Menten_kinetics",
+        "desc": "Foundational model for enzyme kinetics."
+      },
+      {
+        "title": "NCBI PubMed",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/",
+        "desc": "The primary database for biomedical literature."
+      }
+    ]
+  },
+  {
+    "category": "Photography",
+    "description": "Gear, optics, and planning tools.",
+    "links": [
+      {
+        "title": "PhotoPills",
+        "url": "https://www.photopills.com/",
+        "desc": "Essential for planning sun, moon, and Milky Way alignments."
+      }
+    ]
+  }
+]

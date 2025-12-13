@@ -1,16 +1,284 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
+const allPosts = await getCollection('posts');
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const featuredPost = sortedPosts[0];
+
+const tagline = "Notes on entropy, light, and the code that holds them together.";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Home" wide={true}>
+  
+  <section class="hero-split">
+    <div class="hero-content">
+      <h1 class="hero-title">Heat Shock <span class="highlight">Protocols</span></h1>
+      
+      <p class="hero-desc">{tagline}</p>
+
+      <blockquote class="hero-quote">
+        “The difference between screwing around and science is writing it down.”
+        <footer>— Adam Savage</footer>
+      </blockquote>
+    </div>
+
+    <div class="hero-image-container">
+       <img src="/images/ui/logo.png" alt="Lab Notebook Visual" class="hero-img" />
+    </div>
+  </section>
+
+  <section class="featured-section">
+    <div class="section-header">
+      <span class="section-label">Latest Protocol</span>
+      <hr class="section-line" />
+    </div>
+    
+    {featuredPost ? (
+      <a href={`/posts/${featuredPost.slug}`} class="featured-card">
+        <div class="featured-content">
+          <div class="featured-meta">
+             <span class="date">{featuredPost.data.pubDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+             {featuredPost.data.tags.length > 0 && <span class="tag">#{featuredPost.data.tags[0]}</span>}
+          </div>
+          <h2 class="featured-title">{featuredPost.data.title}</h2>
+          <p class="featured-desc">{featuredPost.data.description}</p>
+          <span class="read-more">View Entry →</span>
+        </div>
+      </a>
+    ) : (
+      <div class="empty-state">No observations logged yet.</div>
+    )}
+  </section>
+
+  <section class="system-index">
+    <div class="index-grid">
+      <a href="/archive" class="index-item">
+        <span class="index-number">01</span>
+        <div class="index-text">
+          <h3>The Archive</h3>
+          <p>Chronological records.</p>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+
+      <a href="/resources" class="index-item">
+        <span class="index-number">02</span>
+        <div class="index-text">
+          <h3>Resources</h3>
+          <p>Tools & References.</p>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* --- 1. HERO --- */
+  .hero-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 3rem 2rem; 
+    align-items: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    margin-top: 2rem; 
+    margin-bottom: 4rem;
+  }
+
+  @media (min-width: 900px) {
+    .hero-split {
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 4rem;
+      padding: 5rem;
+      margin-top: 3rem;
+    }
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: 2.75rem; 
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+  }
+  
+  @media (min-width: 900px) { 
+    .hero-title { font-size: 5rem; margin-bottom: 1.5rem; } 
+  }
+  
+  /* UPDATE: "Protocols" is now Gold */
+  .highlight { 
+    color: var(--accent-secondary); 
+    font-style: italic; 
+  }
+
+  .hero-desc {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 50ch;
+    line-height: 1.6;
+  }
+  @media (min-width: 900px) { .hero-desc { font-size: 1.2rem; margin-bottom: 3rem; } }
+
+/* MARGINALIA: Quiet, unassuming, lower hierarchy */
+  .hero-quote {
+    font-family: var(--font-mono);
+    /* Smaller font size */
+    font-size: 0.8rem; 
+    /* Muted color so it doesn't fight the title */
+    color: var(--text-muted); 
+    opacity: 0.8;
+    
+    /* Removed the border and background box ("Card-ness") */
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-top: 1rem;
+    
+    /* Italicize slightly to separate from data */
+    font-style: italic;
+    max-width: 45ch;
+  }
+  
+  @media (min-width: 900px) { .hero-quote { font-size: 0.95rem; padding: 1.5rem; padding-left: 1.5rem; } }
+  
+  .hero-quote footer {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--accent-secondary); /* Gold signature */
+      font-style: normal;
+      font-weight: 500;
+  }
+  
+  .hero-quote footer::before { content: "— "; }
+
+  .hero-image-container {
+    position: relative; aspect-ratio: 4/3; overflow: hidden;
+    border-radius: var(--radius); border: 1px solid var(--border);
+    transform: rotate(2deg); transition: transform 0.3s ease; width: 100%; 
+  }
+  .hero-image-container:hover { transform: rotate(0deg); }
+
+  .hero-img { width: 100%; height: 100%; object-fit: cover; background: var(--bg-surface); }
+
+  /* --- 2. FEATURED SECTION --- */
+  .featured-section { padding: 4rem 0; }
+  
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+  .section-label { 
+    font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; 
+    letter-spacing: 0.1em; color: var(--text-muted); white-space: nowrap;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); border: none; }
+
+  .featured-card {
+    display: block; text-decoration: none;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+  
+  @media (min-width: 900px) { .featured-card { padding: 3rem; } }
+  
+  /* HOVER: Border turns Red */
+  .featured-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  }
+
+  .featured-meta { 
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); 
+    margin-bottom: 0.75rem; display: flex; gap: 0.75rem; text-transform: uppercase;
+  }
+  @media (min-width: 900px) { .featured-meta { font-size: 0.85rem; margin-bottom: 1rem; gap: 1rem; } }
+
+  /* UPDATE: Tags/Dates are Gold */
+  .tag, .date { color: var(--accent-secondary); font-weight: 500; }
+
+  .featured-title {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    /* UPDATE: Title is Green by default */
+    color: var(--accent-nature);
+    margin-bottom: 0.75rem;
+    line-height: 1.1;
+    transition: color 0.2s ease;
+  }
+  @media (min-width: 900px) { .featured-title { font-size: 2.5rem; margin-bottom: 1rem; } }
+
+  /* HOVER: Title turns Red */
+  .featured-card:hover .featured-title { color: var(--accent-primary); }
+
+  .featured-desc {
+    font-family: var(--font-sans); font-size: 1rem; color: var(--text-muted);
+    max-width: 65ch; margin-bottom: 1.5rem;
+  }
+  @media (min-width: 900px) { .featured-desc { font-size: 1.1rem; margin-bottom: 2rem; } }
+
+  /* UPDATE: Read More is Green -> Red */
+  .read-more {
+    font-family: var(--font-mono); font-size: 0.9rem; 
+    color: var(--accent-nature);
+    transition: color 0.2s ease;
+  }
+  .featured-card:hover .read-more { color: var(--accent-primary); }
+
+  /* --- 3. SYSTEM INDEX --- */
+  .system-index { padding-bottom: 6rem; }
+  .index-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  @media (min-width: 600px) { .index-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; } }
+
+  .index-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.5rem; background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    text-decoration: none; transition: all 0.2s;
+  }
+  @media (min-width: 900px) { .index-item { padding: 2rem; gap: 1.5rem; } }
+  
+  .index-item:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+
+  .index-number {
+    font-family: var(--font-mono); font-size: 1.25rem; color: var(--border); font-weight: 700;
+  }
+  @media (min-width: 900px) { .index-number { font-size: 1.5rem; } }
+  
+  /* HOVER: Numbers turn Gold? Or Red? Let's go Gold for data. */
+  .index-item:hover .index-number { color: var(--accent-secondary); }
+
+  /* UPDATE: Titles Green -> Red */
+  .index-text h3 {
+    font-family: var(--font-serif); font-size: 1.1rem; 
+    color: var(--accent-nature); margin: 0;
+    transition: color 0.2s;
+  }
+  .index-item:hover .index-text h3 { color: var(--accent-primary); }
+
+  @media (min-width: 900px) { .index-text h3 { font-size: 1.25rem; } }
+  
+  .index-text p {
+    font-family: var(--font-sans); font-size: 0.85rem; color: var(--text-muted); margin: 0;
+  }
+  @media (min-width: 900px) { .index-text p { font-size: 0.9rem; } }
+
+  .arrow { margin-left: auto; color: var(--text-muted); transition: color 0.2s; }
+  .index-item:hover .arrow { color: var(--accent-primary); }
+  
+  .empty-state {
+    padding: 3rem; background: var(--bg-surface);
+    border: 1px dashed var(--border); border-radius: var(--radius);
+    color: var(--text-muted); font-family: var(--font-mono); text-align: center;
+  }
+</style>
