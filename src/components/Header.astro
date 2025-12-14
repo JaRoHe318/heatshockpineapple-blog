@@ -31,7 +31,7 @@ const currentPath = pathname.slice(1);
             <span>Search</span>
           </button>
           
-          <button class="icon-btn theme-trigger" aria-label="Toggle Dark Mode" type="button">
+          <button class="icon-btn theme-toggle" aria-label="Toggle Dark Mode" type="button">
             <span class="theme-text">Theme</span>
             <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -45,7 +45,7 @@ const currentPath = pathname.slice(1);
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </button>
 
-      <button class="icon-btn theme-trigger desktop-only" aria-label="Toggle Dark Mode" type="button">
+      <button class="icon-btn theme-toggle desktop-only" aria-label="Toggle Dark Mode" type="button">
         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
@@ -82,22 +82,33 @@ const currentPath = pathname.slice(1);
       return clone;
     };
 
-    // --- 1. MOBILE MENU LOGIC ---
+// --- 1. MOBILE MENU LOGIC ---
     if (menuToggle && nav) {
       const newToggle = replaceWithClone(menuToggle);
       menuToggle = newToggle;
 
+      // 1. Toggle Button Click
       menuToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         menuToggle.classList.toggle('open');
         nav.classList.toggle('open');
       });
 
+      // 2. Link Click (Close menu when navigating)
       nav.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
           menuToggle.classList.remove('open');
           nav.classList.remove('open');
         });
+      });
+
+      // 3. NEW: Background Click (Close menu when tapping empty space)
+      nav.addEventListener('click', (e) => {
+        // If the click target IS the nav container (and not a link inside it)
+        if (e.target === nav) {
+          menuToggle.classList.remove('open');
+          nav.classList.remove('open');
+        }
       });
     }
 
@@ -211,7 +222,7 @@ const currentPath = pathname.slice(1);
     }
 
     // --- 6. THEME TOGGLE ---
-    document.querySelectorAll('.theme-trigger').forEach((btn) => {
+    document.querySelectorAll('.theme-toggle').forEach((btn) => {
       const newBtn = replaceWithClone(btn);
       newBtn.addEventListener('click', () => {
         const element = document.documentElement;

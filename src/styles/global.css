@@ -5,28 +5,28 @@
   /* --- LAYOUT --- */
   --reading-width: 740px;
 
-  /* --- COLORS --- */
-  --bg-body: #fdfbf7;
-  --bg-paper: #fdfbf7;
-  --bg-surface: #ffffff;
+  /* --- COLORS (Mapped to Tokens) --- */
+  --bg-body: var(--bg-paper);
 
   /* 1. HEAT (Interaction): Oxblood Red */
+  /* Kept local because it is unique to the Blog's "Heat" identity */
   --accent-primary: #751e29;
 
-  /* 2. LIGHT (Data): Antique Gold */
-  --accent-secondary: #a87e23;
+  /* 2. LIGHT (Data): Pineapple Gold */
+  /* MAPPED: Now uses the system gold (#d4b059) */
+  --accent-secondary: var(--brand-secondary);
 
-  /* 3. LIFE (Structure): DEEP JUNGLE GREEN */
-  --accent-nature: #243b30;
+  /* 3. LIFE (Structure): Jungle Green */
+  /* MAPPED: Now uses the system green (#243b30) */
+  --accent-nature: var(--brand-primary);
 
   /* 4. GLOW */
   --accent-glow: rgba(36, 59, 48, 0.12);
   --accent-heat-glow: rgba(117, 30, 41, 0.08);
 
-  /* 5. TEXTURE (The Dot Grid) */
-  /* Reduced opacity to 0.06 so it doesn't fatigue the eye */
+  /* 5. TEXTURE */
   --grid-dot-color: rgba(0, 0, 0, 0.06);
-
+  
   /* Overlay / modal backdrop */
   --overlay-bg: rgba(253, 251, 247, 0.95);
 
@@ -36,24 +36,19 @@
 
 /* --- DARK MODE --- */
 [data-theme="dark"] {
-  --bg-body: #111111;
-  --bg-paper: #111111;
-  --bg-surface: #1a1a1a;
+  /* Backgrounds handled by tokens, but overrides allowed if needed */
+  
+  /* Heat Shift for Dark Mode */
+  --accent-primary: #d66c84; /* Rose */
 
-  --accent-primary: #d66c84; /* Rose (Heat) */
-  --accent-secondary: #d4b059; /* Bright Gold */
-  --accent-nature: #8fbc8f; /* Dark Sea Green */
+  /* Nature Shift for Dark Mode (Optional, or stick to brand-primary) */
+  --accent-nature: #8fbc8f; 
 
   --accent-glow: rgba(143, 188, 143, 0.15);
   --accent-heat-glow: rgba(214, 108, 132, 0.10);
 
-  /* White dots for dark mode (subtle starfield effect) */
   --grid-dot-color: rgba(255, 255, 255, 0.05);
-
-  /* Overlay / modal backdrop */
   --overlay-bg: rgba(17, 17, 17, 0.95);
-
-  /* Selection */
   --selection-bg: rgba(143, 188, 143, 0.22);
 }
 
@@ -66,13 +61,13 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 
-  /* DOT GRID: Now uses the variable to handle Dark/Light switching */
+  /* DOT GRID */
   background-image: radial-gradient(var(--grid-dot-color) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: center top;
 }
 
-/* GLOW EFFECT: Now a mix of Green (Nature) and Red (Heat) */
+/* GLOW EFFECT */
 body::before {
   content: "";
   position: fixed;
@@ -85,15 +80,12 @@ body::before {
     radial-gradient(circle at 90% 80%, var(--accent-heat-glow) 0%, transparent 50%);
 }
 
-/* === OVERLAY / MODAL BACKDROP FIX === */
-/* If you use <dialog> for the search modal, this fixes the green tint: */
+/* === OVERLAY / MODAL BACKDROP === */
 dialog::backdrop {
   background: var(--overlay-bg);
   backdrop-filter: blur(10px);
 }
 
-/* If you use a div overlay instead of <dialog>,
-   rename these selectors to match your actual overlay element. */
 .search-overlay,
 .modal-overlay,
 #search-overlay,
@@ -117,7 +109,7 @@ main {
   letter-spacing: 0.05em;
 }
 
-/* Dates are Gold/Brown */
+/* Dates are Gold */
 time, .mono-meta, .log-date {
   color: var(--accent-secondary) !important;
   opacity: 0.9;
